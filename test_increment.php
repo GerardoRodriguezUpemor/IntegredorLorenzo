@@ -1,0 +1,1 @@
+<?php require 'vendor/autoload.php'; \ = require_once 'bootstrap/app.php'; \ = \->make(Illuminate\Contracts\Console\Kernel::class); \->bootstrap(); \ = App\Models\Group::first(); \->increment('current_count'); echo \->current_count; echo App\Models\Group::first()->current_count; ?>

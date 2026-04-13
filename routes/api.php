@@ -8,6 +8,7 @@ use App\Http\Controllers\Api\Admin\ReportController;
 use App\Http\Controllers\Api\Teacher\CourseManagementController;
 use App\Http\Controllers\Api\Teacher\SubscriberController;
 use App\Http\Controllers\Api\Teacher\ScheduleController;
+use App\Http\Controllers\Api\Teacher\GroupReportController;
 use App\Http\Controllers\Api\Student\CatalogController;
 use App\Http\Controllers\Api\Student\BookingController;
 use App\Http\Controllers\Api\Student\VoteController;
@@ -43,6 +44,9 @@ Route::prefix('v1')->group(function () {
     // 🔒 RUTAS PROTEGIDAS (requiere X-User-Id header)
     // ═══════════════════════════════════════════════
     Route::middleware(SimpleAuth::class)->group(function () {
+        // 👤 PERFIL UNIFICADO (Compartido por todos los roles)
+        Route::get('/profile', [\App\Http\Controllers\Api\Shared\ProfileController::class, 'show']);
+        Route::put('/profile', [\App\Http\Controllers\Api\Shared\ProfileController::class, 'update']);
 
         // ─────────────────────────────────────────
         // 🛡️ ADMIN
@@ -72,6 +76,7 @@ Route::prefix('v1')->group(function () {
             Route::post('/groups/{groupId}/schedule', [ScheduleController::class, 'store']);
             Route::get('/groups/{groupId}/votes', [ScheduleController::class, 'votes']);
             Route::get('/groups/{groupId}/winning-date', [ScheduleController::class, 'winningDate']);
+            Route::get('/groups/{groupId}/report', [GroupReportController::class, 'download']);
         });
 
         // ─────────────────────────────────────────

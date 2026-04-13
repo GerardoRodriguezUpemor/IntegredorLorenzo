@@ -18,6 +18,7 @@ class User extends MongoUser
         'email',
         'password',
         'role',
+        'phone',
     ];
 
     protected $hidden = [

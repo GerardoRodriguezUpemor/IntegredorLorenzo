@@ -3,8 +3,10 @@
     "private": true,
     "type": "module",
     "scripts": {
-        "build": "vite build",
-        "dev": "vite"
+        "dev:backend": "php artisan serve",
+        "dev:frontend": "npm run dev --prefix client",
+        "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+        "build": "vite build"
     },
     "devDependencies": {
         "@tailwindcss/vite": "^4.0.0",
@@ -16,6 +18,7 @@
     },
     "dependencies": {
         "lucide-react": "^1.8.0",
-        "react-router-dom": "^7.14.0"
+        "react-router-dom": "^7.14.0",
+        "serve": "^14.2.6"
     }
 }

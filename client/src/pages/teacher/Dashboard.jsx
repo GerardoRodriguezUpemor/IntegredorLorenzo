@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { Plus, Send, Users, Activity, ExternalLink, Calendar as CalendarIcon } from 'lucide-react';
 
 const TeacherDashboard = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [subscribersData, setSubscribersData] = useState({});
@@ -211,7 +213,7 @@ const TeacherDashboard = () => {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   {course.status !== 'DRAFT' ? (
-                    <button className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)' }}>
+                    <button onClick={() => navigate('/teacher/finances')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)' }}>
                       <CalendarIcon size={16} /> Ver Resultados de Votación
                     </button>
                   ) : (

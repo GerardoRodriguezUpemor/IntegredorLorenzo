@@ -43,8 +43,32 @@ const Finances = () => {
     }
   }, [user]);
 
-  const handleDownloadPDF = (groupName, revenue) => {
-    alert(`Descargando Reporte PDF para [${groupName}] con Ingresos de: $${revenue} USD. (Conexión a librería PDFBox pendiente)`);
+  const handleDownloadPDF = async (groupId, groupName) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/teacher/groups/${groupId}/report`, {
+        headers: { 
+          'X-User-Id': user._id,
+          'Accept': 'application/pdf'
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `reporte_finanzas_${groupName.replace(/\s+/g, '_').toLowerCase()}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "No se pudo generar el reporte.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error de conexión con el servidor.");
+    }
   };
 
   if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}><div className="spinner"></div></div>;
@@ -108,7 +132,7 @@ const Finances = () => {
 
                         {isFull ? (
                           <button 
-                            onClick={() => handleDownloadPDF(group.name, groupRevenue)}
+                            onClick={() => handleDownloadPDF(group.id, group.name)}
                             className="btn btn-outline" 
                             style={{ width: '100%', borderColor: 'var(--success)', color: 'var(--success)', justifyContent: 'center' }}
                           >

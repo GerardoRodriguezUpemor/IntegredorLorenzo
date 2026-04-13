@@ -149,8 +149,9 @@ const Checkout = () => {
                 <h2 style={{ fontSize: '2rem', color: 'white', margin: 0 }}>${group.priceBreakdown.currentPrice}</h2>
               </div>
               <div style={{ textAlign: 'right' }}>
-                <p style={{ fontSize: '0.8rem', color: '#ccc' }}>Si no reservas ahora, el siguiente inscrito pagará:</p>
-                <span style={{ fontSize: '1.2rem', color: 'var(--danger)', textDecoration: 'line-through' }}>${group.priceBreakdown.nextPrice}</span>
+                {/* Funcionalidad dinámica oculta por ahora */}
+                {/* <p style={{ fontSize: '0.8rem', color: '#ccc' }}>Si no reservas ahora, el siguiente inscrito pagará:</p>
+                <span style={{ fontSize: '1.2rem', color: 'var(--danger)', textDecoration: 'line-through' }}>${group.priceBreakdown.nextPrice}</span> */}
               </div>
             </div>
 
@@ -210,7 +211,7 @@ const Checkout = () => {
 
                 <div style={{ background: 'rgba(255, 165, 2, 0.1)', border: '1px solid var(--warning)', padding: '1rem', borderRadius: 'var(--radius-sm)', marginBottom: '1.5rem', display: 'flex', gap: '0.5rem', color: 'var(--warning)', fontSize: '0.85rem' }}>
                   <AlertTriangle size={32} />
-                  <p>Al reservar, bloquearás este asiento y asegurarás este precio durante 5 minutos para procesar el pago.</p>
+                  <p>Al reservar, bloquearás este asiento durante 5 minutos para procesar el pago.</p>
                 </div>
 
                 <button 

@@ -5,145 +5,125 @@ namespace Database\Seeders;
 use App\Models\AuditLog;
 use App\Models\Course;
 use App\Models\Group;
+use App\Models\Reservation;
 use App\Models\ScheduleOption;
 use App\Models\Teacher;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // Limpiar colecciones
+        // 1. Limpieza total de la base de datos
         User::truncate();
         Teacher::truncate();
         Course::truncate();
         Group::truncate();
+        ScheduleOption::truncate();
+        Reservation::truncate();
+        AuditLog::truncate();
 
-        echo "🌱 Sembrando datos EP4 MicroCohorts...\n\n";
+        echo "🚀 Preparando escenario de prueba: 4 alumnos inscritos en 1 curso de Vertiz...\n";
 
-        // ═══════════════════════════════════════════════
-        // 🛡️ ADMIN
-        // ═══════════════════════════════════════════════
+        // 2. Crear Administrador
         $admin = User::create([
             'name' => 'Admin EP4',
             'email' => 'admin@ep4.edu',
             'password' => 'admin123',
             'role' => 'ADMIN',
         ]);
-        echo "✅ Admin: admin@ep4.edu (pass: admin123)\n";
 
-        // ═══════════════════════════════════════════════
-        // 👨‍🏫 TEACHERS (Proveedores)
-        // ═══════════════════════════════════════════════
-        $teachersData = [
-            ['name' => 'Profesor Vertiz', 'email' => 'vertiz@ep4.edu', 'specialty' => 'Ingeniería de Software'],
-            ['name' => 'Profesora Sandra', 'email' => 'sandra@ep4.edu', 'specialty' => 'Matemáticas'],
-            ['name' => 'Profesora Antonia', 'email' => 'antonia@ep4.edu', 'specialty' => 'Ciencias de la Computación'],
+        // 3. Crear Profesor Vertiz
+        $userVertiz = User::create([
+            'name' => 'Profesor Vertiz',
+            'email' => 'vertiz@ep4.edu',
+            'password' => 'teacher123',
+            'role' => 'TEACHER',
+        ]);
+
+        $teacherVertiz = Teacher::create([
+            'user_id' => (string) $userVertiz->_id,
+            'name' => 'Profesor Vertiz',
+            'email' => 'vertiz@ep4.edu',
+            'specialty' => 'Ingeniería de Software',
+        ]);
+
+        // 4. Crear 1 Curso Autorizado
+        $course = Course::create([
+            'name' => 'Pruebas de Software Avanzadas',
+            'description' => 'Aprende TDD, BDD y arquitecturas limpias para crear software robusto.',
+            'teacher_id' => (string) $teacherVertiz->_id,
+            'status' => 'APPROVED',
+            'approved_by' => (string) $admin->_id,
+            'approved_at' => now(),
+        ]);
+
+        // 5. Crear 1 Grupo con capacidad 5
+        $group = Group::create([
+            'course_id' => (string) $course->_id,
+            'name' => 'Grupo Único de Test',
+            'status' => 'RESERVED', // Cambia de OPEN a RESERVED porque ya tendrá alumnos
+            'max_capacity' => 5,
+            'current_count' => 4, // Ya hay 4 inscritos
+        ]);
+
+        // 6. Proponer 3 fechas para votación
+        $dates = [
+            Carbon::now()->addDays(7)->setHour(10)->setMinute(0),
+            Carbon::now()->addDays(10)->setHour(14)->setMinute(0),
+            Carbon::now()->addDays(14)->setHour(16)->setMinute(0),
         ];
 
-        $teachers = [];
-        foreach ($teachersData as $td) {
-            $user = User::create([
-                'name' => $td['name'],
-                'email' => $td['email'],
-                'password' => 'teacher123',
-                'role' => 'TEACHER',
+        $options = [];
+        foreach ($dates as $date) {
+            $options[] = ScheduleOption::create([
+                'group_id' => (string) $group->_id,
+                'proposed_date' => $date,
+                'vote_count' => 1, // Simulamos 1 voto por opción para que haya dispersión
             ]);
-
-            $teacher = Teacher::create([
-                'user_id' => (string) $user->_id,
-                'name' => $td['name'],
-                'email' => $td['email'],
-                'specialty' => $td['specialty'],
-            ]);
-
-            $teachers[$td['name']] = $teacher;
-            echo "✅ Teacher: {$td['email']} (pass: teacher123) — {$td['specialty']}\n";
         }
 
-        // ═══════════════════════════════════════════════
-        // 📚 COURSES (Todos APPROVED para testing)
-        // ═══════════════════════════════════════════════
-        $coursesData = [
-            ['name' => 'Pruebas de Software', 'description' => 'Curso completo de testing: unitario, integración, E2E, TDD y BDD. Aprende a escribir software confiable.', 'teacher' => 'Profesor Vertiz'],
-            ['name' => 'Ecuaciones Diferenciales', 'description' => 'Ecuaciones diferenciales ordinarias y parciales. Métodos analíticos y numéricos con aplicaciones en ingeniería.', 'teacher' => 'Profesora Sandra'],
-            ['name' => 'Arquitectura de Sistemas', 'description' => 'Patrones de diseño, microservicios, DDD, CQRS y Event Sourcing. Diseña sistemas escalables y mantenibles.', 'teacher' => 'Profesora Antonia'],
-            ['name' => 'Base de Datos', 'description' => 'SQL, NoSQL, diseño de esquemas, optimización de queries, indexación y transacciones distribuidas.', 'teacher' => 'Profesor Vertiz'],
-        ];
-
-        $courses = [];
-        foreach ($coursesData as $cd) {
-            $teacher = $teachers[$cd['teacher']];
-            $course = Course::create([
-                'name' => $cd['name'],
-                'description' => $cd['description'],
-                'teacher_id' => (string) $teacher->_id,
-                'status' => 'APPROVED',
-                'approved_by' => (string) $admin->_id,
-                'approved_at' => now(),
-            ]);
-            $courses[] = $course;
-
-            // 2 grupos por curso
-            for ($g = 1; $g <= 2; $g++) {
-                Group::create([
-                    'course_id' => (string) $course->_id,
-                    'name' => "Grupo {$g}",
-                    'status' => 'OPEN',
-                    'max_capacity' => 5,
-                    'current_count' => 0,
-                ]);
-            }
-
-            echo "✅ Curso: {$cd['name']} ({$cd['teacher']}) — 2 grupos\n";
-        }
-
-        // ═══════════════════════════════════════════════
-        // 🎓 STUDENTS (Clientes)
-        // ═══════════════════════════════════════════════
+        // 7. Crear 4 Estudiantes y sus inscripciones (PAID)
         $studentsData = [
             ['name' => 'Carlos García', 'email' => 'carlos@estudiante.edu'],
             ['name' => 'María López', 'email' => 'maria@estudiante.edu'],
             ['name' => 'Juan Hernández', 'email' => 'juan@estudiante.edu'],
             ['name' => 'Ana Martínez', 'email' => 'ana@estudiante.edu'],
-            ['name' => 'Pedro Sánchez', 'email' => 'pedro@estudiante.edu'],
         ];
 
-        foreach ($studentsData as $sd) {
-            User::create([
+        foreach ($studentsData as $index => $sd) {
+            $user = User::create([
                 'name' => $sd['name'],
                 'email' => $sd['email'],
                 'password' => 'student123',
                 'role' => 'STUDENT',
             ]);
-            echo "✅ Student: {$sd['email']} (pass: student123)\n";
+
+            // Crear Reservación PAGADA
+            Reservation::create([
+                'user_id' => (string) $user->_id,
+                'group_id' => (string) $group->_id,
+                'schedule_option_id' => (string) $options[$index % 3]->_id,
+                'status' => 'PAID',
+                'frozen_price' => 50.00,
+                'paid_at' => now(),
+                'expires_at' => now()->addYears(1), // No expira
+            ]);
         }
 
-        // ═══════════════════════════════════════════════
-        // 📅 SCHEDULE OPTIONS (Demo: 3 fechas para el primer grupo)
-        // ═══════════════════════════════════════════════
-        $firstGroup = Group::first();
-        if ($firstGroup) {
-            $dates = [
-                now()->addDays(7)->setHour(10)->setMinute(0),
-                now()->addDays(10)->setHour(14)->setMinute(0),
-                now()->addDays(14)->setHour(16)->setMinute(0),
-            ];
+        // Estudiante extra (el que usará Gerardo para entrar)
+        User::create([
+            'name' => 'Gerardo Estudiante',
+            'email' => 'gerardo@estudiante.edu',
+            'password' => 'student123',
+            'role' => 'STUDENT',
+        ]);
 
-            foreach ($dates as $date) {
-                ScheduleOption::create([
-                    'group_id' => (string) $firstGroup->_id,
-                    'proposed_date' => $date,
-                    'vote_count' => 0,
-                ]);
-            }
-            echo "✅ 3 fechas propuestas para {$firstGroup->name} del primer curso\n";
-        }
-
-        echo "\n🎉 ¡Seed completado! Base de datos lista.\n";
-        echo "───────────────────────────────────────\n";
-        echo "Total: 1 admin + 3 teachers + 4 cursos + 8 grupos + 5 students\n";
+        echo "\n✅ Escenario listo. \n";
+        echo "Materias: 1 (Vertiz) \n";
+        echo "Grupo: {$group->name} (4/5 inscritos) \n";
+        echo "Entra con: gerardo@estudiante.edu (pass: student123) para ser el 5to.\n";
     }
 }

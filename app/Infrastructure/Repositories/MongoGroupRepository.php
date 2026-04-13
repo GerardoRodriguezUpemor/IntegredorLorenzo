@@ -85,7 +85,7 @@ class MongoGroupRepository implements GroupRepositoryInterface
     private function updateGroupStatus(Group $group): void
     {
         $newStatus = match (true) {
-            $group->current_count >= $group->max_capacity => GroupStatus::FULL->value,
+            $group->current_count >= $group->max_capacity => GroupStatus::ACTIVE->value,
             $group->current_count > 0 => GroupStatus::RESERVED->value,
             default => GroupStatus::OPEN->value,
         };

@@ -12,6 +12,7 @@ import TeacherDashboard from './pages/teacher/Dashboard';
 import Finances from './pages/teacher/Finances';
 import AdminLayout from './components/layouts/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
+import Profile from './pages/shared/Profile';
 
 // A simple protected route wrapper
 const ProtectedRoute = ({ children, allowedRole }) => {
@@ -41,6 +42,7 @@ function App() {
               <Route path="courses" element={<Catalog />} />
               <Route path="my-courses" element={<MyCourses />} />
               <Route path="checkout/:groupId" element={<Checkout />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
 
             {/* Teacher Routes */}
@@ -51,6 +53,7 @@ function App() {
             }>
               <Route path="dashboard" element={<TeacherDashboard />} />
               <Route path="finances" element={<Finances />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
 
             {/* Admin Routes */}
@@ -60,6 +63,7 @@ function App() {
               </ProtectedRoute>
             }>
               <Route path="dashboard" element={<AdminDashboard />} />
+              <Route path="profile" element={<Profile />} />
             </Route>
             
             {/* Catch All */}

@@ -26,19 +26,22 @@ class PricingEngine
             throw new \InvalidArgumentException("El número de alumno debe estar entre 1 y 5. Recibido: {$n}");
         }
 
+        // Funcionalidad dinámica comentada para el futuro según requerimiento
+        /*
         $currentPrice = self::BASE_PRICE + self::COEFFICIENT * exp(self::DECAY_RATE * (1 - $n));
         $firstPrice = self::BASE_PRICE + self::COEFFICIENT * exp(self::DECAY_RATE * (1 - 1));
-
         $savedAmount = $firstPrice - $currentPrice;
-        $discountPercentage = $firstPrice > 0
-            ? ($savedAmount / $firstPrice) * 100
-            : 0.0;
+        $discountPercentage = $firstPrice > 0 ? ($savedAmount / $firstPrice) * 100 : 0.0;
+        */
+
+        // Por ahora, todos pagan precio fijo de 50
+        $fixedPrice = self::BASE_PRICE;
 
         return new PriceBreakdown(
             basePrice: self::BASE_PRICE,
-            currentPrice: round($currentPrice, 2),
-            savedAmount: round($savedAmount, 2),
-            discountPercentage: round($discountPercentage, 2)
+            currentPrice: round($fixedPrice, 2),
+            savedAmount: 0.0,
+            discountPercentage: 0.0
         );
     }
 

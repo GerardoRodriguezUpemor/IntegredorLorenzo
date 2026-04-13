@@ -156,6 +156,13 @@
                 <div class="info-label">Grupo:</div>
                 <div class="info-value">{{ $group->name }}</div>
             </div>
+            <div class="info-row">
+                <div class="info-label">Fecha Elegida:</div>
+                <div class="info-value" style="color: #6c63ff; font-weight: bold;">
+                    {{ $reservation->scheduleOption ? \Carbon\Carbon::parse($reservation->scheduleOption->proposed_date)->format('d/m/Y H:i') : 'Por confirmar' }}
+                    <small style="display: block; color: #888; font-weight: normal;">(Elegida al momento de reservar)</small>
+                </div>
+            </div>
         </div>
     </div>
 

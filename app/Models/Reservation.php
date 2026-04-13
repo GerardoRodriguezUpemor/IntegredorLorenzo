@@ -47,6 +47,14 @@ class Reservation extends Model
     }
 
     /**
+     * La opción de horario elegida por el alumno.
+     */
+    public function scheduleOption()
+    {
+        return $this->belongsTo(ScheduleOption::class);
+    }
+
+    /**
      * ¿La reservación ha expirado?
      */
     public function isExpired(): bool

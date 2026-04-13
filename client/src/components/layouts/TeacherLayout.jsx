@@ -17,7 +17,7 @@ const TeacherLayout = () => {
       {/* Sidebar for Teacher */}
       <aside style={{ width: '250px', background: 'rgba(15, 15, 19, 0.9)', borderRight: '1px solid var(--border-glass)', display: 'flex', flexDirection: 'column' }}>
         <div style={{ padding: '2rem 1.5rem', borderBottom: '1px solid var(--border-glass)' }}>
-          <Link to="/" className="nav-brand" style={{ fontSize: '1.2rem' }}>
+          <Link to="/teacher/dashboard" className="nav-brand" style={{ fontSize: '1.2rem' }}>
             <BookOpen className="highlight" size={24} />
             <span>Micro<span className="highlight">Cohorts</span></span>
           </Link>
@@ -29,6 +29,9 @@ const TeacherLayout = () => {
           </Link>
           <Link to="/teacher/finances" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none', color: 'var(--text-main)' }}>
             <Activity size={20} /> Finanzas y Clases
+          </Link>
+          <Link to="/teacher/profile" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none', color: 'var(--text-main)' }}>
+            <Users size={20} /> Mi Perfil
           </Link>
         </nav>
 

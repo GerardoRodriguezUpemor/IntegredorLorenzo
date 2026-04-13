@@ -20,14 +20,31 @@ class CatalogController extends Controller
             ->orderBy('approved_at', 'desc')
             ->get()
             ->map(function ($course) {
-                $groups = $course->groups->map(fn($g) => [
-                    'id' => (string) $g->_id,
-                    'name' => $g->name,
-                    'status' => $g->status,
-                    'available_seats' => $g->availableSeats(),
-                    'current_count' => $g->current_count,
-                    'max_capacity' => $g->max_capacity,
-                ]);
+                $groups = $course->groups->map(function($g) {
+                    $options = \App\Models\ScheduleOption::where('group_id', (string) $g->_id)->get();
+                    $nextDate = null;
+                    
+                    if ($options->isNotEmpty()) {
+                        $maxVotes = $options->max('vote_count');
+                        if ($maxVotes > 0) {
+                            $nextDate = $options->where('vote_count', $maxVotes)->first()->proposed_date;
+                        } else {
+                            $nextDate = $options->where('proposed_date', '>=', now())
+                                ->sortBy('proposed_date')
+                                ->first()?->proposed_date;
+                        }
+                    }
+
+                    return [
+                        'id' => (string) $g->_id,
+                        'name' => $g->name,
+                        'status' => $g->status,
+                        'available_seats' => $g->availableSeats(),
+                        'current_count' => $g->current_count,
+                        'max_capacity' => $g->max_capacity,
+                        'next_date' => $nextDate ? $nextDate->toIso8601String() : null,
+                    ];
+                });
 
                 return [
                     'id' => (string) $course->_id,

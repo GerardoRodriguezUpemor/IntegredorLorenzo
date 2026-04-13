@@ -19,10 +19,15 @@ const StudentLayout = () => {
           <span>Micro<span className="highlight">Cohorts</span></span>
         </Link>
         <div className="nav-links">
+          <Link to="/student/courses" className="btn btn-outline" style={{ border: 'none' }}>
+            Explorar Catálogo
+          </Link>
           <Link to="/student/my-courses" className="btn btn-outline" style={{ border: 'none' }}>
             Mis Cursos
           </Link>
-          <span>Hola, {user?.name}</span>
+          <Link to="/student/profile" className="btn btn-outline" style={{ border: 'none', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+            <UserCircle size={18} /> Mi Perfil
+          </Link>
           <button onClick={handleLogout} className="btn btn-outline" style={{ padding: '0.4rem 1rem' }}>
             <LogOut size={16} /> Salir
           </button>

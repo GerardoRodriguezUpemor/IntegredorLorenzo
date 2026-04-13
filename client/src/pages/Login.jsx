@@ -5,6 +5,7 @@ import { BookOpen, AlertCircle } from 'lucide-react';
 
 const Login = () => {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [role, setRole] = useState('STUDENT');
   const [error, setError] = useState('');
   const navigate = useNavigate();
@@ -12,16 +13,12 @@ const Login = () => {
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    if (!email) {
-      setError('Por favor ingresa un email');
+    if (!email || !password) {
+      setError('Por favor ingresa email y contraseña');
       return;
     }
     
     try {
-      // In Laravel Seeder, password is 'student123' for students, 'teacher123' for teachers...
-      // For fast testing, we assume 'student123' unless it's teacher
-      const password = role === 'STUDENT' ? 'student123' : (role === 'TEACHER' ? 'teacher123' : 'admin123');
-
       const res = await fetch('http://127.0.0.1:8000/api/v1/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
@@ -78,6 +75,17 @@ const Login = () => {
               placeholder="tu@email.com" 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+
+          <div className="form-group">
+            <label className="form-label">Contraseña</label>
+            <input 
+              type="password" 
+              className="form-input" 
+              placeholder="••••••••" 
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </div>
 

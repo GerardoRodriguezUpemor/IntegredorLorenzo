@@ -29,8 +29,18 @@
 | **React** | 18.x | Librería de UI declarativa |
 | **Vite** | 5.x | Build tool y dev server ultra-rápido |
 | **React Router DOM** | 6.x | Enrutamiento SPA del lado del cliente |
-| **Lucide React** | Latest | Librería de íconos SVG |
+| **lucide-react** | Latest | Librería de íconos SVG |
 | **Vanilla CSS** | — | Estilos personalizados (Glassmorphism, dark mode) |
+| **dompdf** | Latest | Generación de reportes PDF en el servidor |
+
+---
+
+## Módulos Core (EP4 Implementation)
+
+1. **Motor de Búsqueda y Filtros**: Implementación de búsqueda por nombre y filtros de disponibilidad en tiempo real para el catálogo.
+2. **Generador de Recibos Dinámicos**: Servicio que inyecta datos de votación (horario ganador) en comprobantes PDF para el estudiante.
+3. **Reportes de Cohorte**: Sistema de generación de reportes financieros para profesores cuando los grupos alcanzan el cupo (5/5).
+4. **Perfil Unificado**: Sistema multi-rol con avatares por iniciales, gestión de contacto (teléfono) y seguridad.
 
 ---
 

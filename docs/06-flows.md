@@ -43,7 +43,13 @@ Este documento describe, paso a paso, cada interacción posible dentro de la pla
              .populate("teacher")
    
    Frontend recibe array de cursos APROBADOS con sus grupos.
-   Para cada grupo, aplica la fórmula de decaimiento exponencial
+    
+    ### Filtrado Reactivo (Frontend)
+    - **Búsqueda**: `courses.filter(c => c.name.toLowerCase().includes(searchQuery))`
+    - **Disponibilidad**: Oculta grupos donde `g.current_count === 5`.
+    - **Fecha Próxima**: Si no hay votos, muestra la fecha más cercana; si hay votos, muestra la opción ganadora.
+    
+    Para cada grupo, aplica la fórmula de decaimiento exponencial
    localmente para mostrar el precio estimado actual:
    
    precio = 200 * Math.exp(-0.25 * current_count)
@@ -417,3 +423,34 @@ Este es el ciclo completo de vida de un curso desde su creación hasta la clase 
 | Admin no puede aprobar un DRAFT | Backend verifica `status === PENDING_APPROVAL` antes de hacer `approve()` |
 | Profesor no puede editar un curso APPROVED | Backend + Frontend solo muestran edición en DRAFT |
 | Un estudiante vota una sola vez | Unique index en `{group_id, user_id}` en `schedule_votes` |
+| Avatar de Iniciales | Generado dinámicamente en frontend basado en `user.name` |
+| Sincronización Teacher | Actualización de `Profile` replica datos en colección `teachers` |
+
+---
+
+## 👤 FLUJO COMPARTIDO: GESTIÓN DE PERFIL
+
+Este flujo es idéntico para **Student, Teacher y Admin**.
+
+```
+1. Usuario hace clic en "Mi Perfil" en la Navbar/Sidebar
+   → Navega a /profile (o /role/profile)
+
+2. <Profile /> se monta:
+   GET /api/v1/profile
+   Backend: Retorna User { name, email, phone, role } y carga relación teacher si aplica.
+
+3. Usuario actualiza datos:
+   PUT /api/v1/profile
+   Body: { name, email, phone, specialty?, password? }
+
+   Backend (ProfileController@update):
+   a) Valida Name, Email (único), Phone y Specialty (si es teacher).
+   b) Actualiza User en MongoDB.
+   c) Si es Teacher: Sincroniza Specialty y Phone en la colección de Teachers.
+   d) Si password está presente: Hashea y actualiza credencial.
+
+4. Frontend:
+   → Actualiza AuthContext para reflejar el nuevo nombre/email globalmente.
+   → Muestra alerta de éxito: "Perfil actualizado correctamente."
+```

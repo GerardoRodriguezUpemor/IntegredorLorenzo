@@ -55,8 +55,32 @@ const MyCourses = () => {
     }
   }, [user]);
 
-  const downloadReceipt = (id) => {
-    alert(`Descargando recibo de pago PDF de la base de datos...`);
+  const downloadReceipt = async (id) => {
+    try {
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/reservations/${id}/receipt`, {
+        headers: { 
+          'X-User-Id': user._id,
+          'Accept': 'application/pdf'
+        }
+      });
+
+      if (response.ok) {
+        const blob = await response.blob();
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `recibo_microcohorts_${id.substring(id.length - 6)}.pdf`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+      } else {
+        const errorData = await response.json();
+        alert(errorData.message || "Error al generar el recibo.");
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Error de conexión con el servidor.");
+    }
   };
 
   if (loading) {

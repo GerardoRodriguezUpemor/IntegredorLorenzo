@@ -35,6 +35,9 @@ const AdminLayout = () => {
           <div className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none', opacity: 0.5, cursor: 'not-allowed' }}>
             <BarChart size={20} /> Métricas Generales
           </div>
+          <Link to="/admin/profile" className="btn btn-outline" style={{ justifyContent: 'flex-start', border: 'none', color: 'var(--text-main)' }}>
+            <Shield size={20} /> Mi Perfil
+          </Link>
         </nav>
 
         <div style={{ padding: '1.5rem', borderTop: '1px solid var(--border-glass)' }}>

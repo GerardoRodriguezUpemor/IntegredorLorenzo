@@ -8,6 +8,8 @@ const Catalog = () => {
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [showAvailableOnly, setShowAvailableOnly] = useState(false);
 
   useEffect(() => {
     // In a real app we'd fetch from Laravel. We'll simulate the API call here to demonstrate pure frontend logic first.
@@ -24,9 +26,9 @@ const Catalog = () => {
             ...c,
             _id: c.id,
             groups: c.groups.map(g => {
-              // Replicate pricing formula for fast frontend display: P(n) = 50 + 70 * exp(1.25 * (1 - n))
-              // Real calculation is done strictly in backend when reserving.
-              const currentPrice = Math.round(50 + 70 * Math.exp(1.25 * (1 - (g.current_count + 1))));
+              // Funcionalidad dinámica comentada para el futuro
+              // const currentPrice = Math.round(50 + 70 * Math.exp(1.25 * (1 - (g.current_count + 1))));
+              const currentPrice = 50; 
               return {
                  ...g,
                  _id: g.id,
@@ -47,6 +49,15 @@ const Catalog = () => {
     fetchCatalog();
   }, [user]);
 
+  const filteredCourses = courses.filter(course => {
+    const matchesSearch = course.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const firstGroup = course.groups?.[0];
+    const isAvailable = firstGroup ? (firstGroup.current_count < firstGroup.max_capacity) : false;
+    
+    if (showAvailableOnly && !isAvailable) return false;
+    return matchesSearch;
+  });
+
   if (loading) {
     return (
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '60vh' }}>
@@ -60,20 +71,33 @@ const Catalog = () => {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
           <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Explorar Cohortes</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Cursos exclusivos. Topes estrictos de 5 alumnos. Precios dinámicos.</p>
+          <p style={{ color: 'var(--text-muted)' }}>Cursos exclusivos. Topes estrictos de 5 alumnos. Precio único de $50.</p>
         </div>
-        <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', width: '300px' }}>
-          <Search size={18} color="var(--text-muted)" style={{ marginRight: '0.5rem' }} />
-          <input 
-            type="text" 
-            placeholder="Buscar por tecnología..." 
-            style={{ background: 'transparent', border: 'none', color: 'white', flex: 1, outline: 'none' }}
-          />
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', width: '300px' }}>
+            <Search size={18} color="var(--text-muted)" style={{ marginRight: '0.5rem' }} />
+            <input 
+              type="text" 
+              placeholder="Buscar curso por nombre..." 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ background: 'transparent', border: 'none', color: 'white', flex: 1, outline: 'none' }}
+            />
+          </div>
+          <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', fontSize: '0.9rem', whiteSpace: 'nowrap' }}>
+            <input 
+              type="checkbox" 
+              checked={showAvailableOnly}
+              onChange={(e) => setShowAvailableOnly(e.target.checked)}
+              style={{ width: '18px', height: '18px', accentColor: 'var(--primary)' }}
+            />
+            Solo con lugares disponibles
+          </label>
         </div>
       </div>
 
       <div className="grid grid-cols-3 gap-6">
-        {courses.map(course => {
+        {filteredCourses.map(course => {
           const group = course.groups?.[0]; // Taking the first group for demo
           if (!group) return null;
           
@@ -96,8 +120,11 @@ const Catalog = () => {
                   {course.description}
                 </p>
                 
-                <div style={{ display: 'flex', gap: '1rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem', color: 'var(--text-muted)', fontSize: '0.85rem' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}><Users size={14}/> Prof. {course.teacher?.name}</span>
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem', color: 'var(--text-main)' }}>
+                    <Clock size={14}/> Próxima Clase: {group.next_date ? new Date(group.next_date).toLocaleDateString('es-ES', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : 'Por definir'}
+                  </span>
                 </div>
               </div>
               

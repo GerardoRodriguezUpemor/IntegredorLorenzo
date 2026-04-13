@@ -14,14 +14,14 @@ class ReceiptPdfGenerator
      */
     public function generate(Reservation $reservation)
     {
-        $reservation->load(['user', 'group.course.teacher', 'scheduleOption']);
+        $reservation->load(['user', 'group.course.provider', 'scheduleOption']);
 
         $data = [
             'reservation' => $reservation,
             'student' => $reservation->user,
             'group' => $reservation->group,
             'course' => $reservation->group->course,
-            'teacher' => $reservation->group->course->teacher,
+            'teacher' => $reservation->group->course->provider,
             'generated_at' => now()->format('d/m/Y H:i:s'),
         ];
 

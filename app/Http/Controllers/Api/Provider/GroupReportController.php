@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Teacher;
+namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Infrastructure\Pdf\GroupReportPdfGenerator;
 use App\Models\Group;
-use App\Models\Teacher;
+use App\Models\Provider;
 use Illuminate\Http\Request;
 
 class GroupReportController extends Controller
@@ -15,16 +15,16 @@ class GroupReportController extends Controller
     ) {}
 
     /**
-     * GET /api/v1/teacher/groups/{groupId}/report
+     * GET /api/v1/provider/groups/{groupId}/report
      */
     public function download(Request $request, string $groupId)
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
         $group = Group::with('course')->find($groupId);
 
-        if (!$group || $group->course->teacher_id !== (string) $teacher->_id) {
+        if (!$group || $group->course->provider_id !== (string) $provider->_id) {
             return response()->json(['message' => 'Grupo no encontrado o no pertenece a usted.', 'status' => 'error'], 404);
         }
 

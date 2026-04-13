@@ -38,7 +38,7 @@ class ProfileController extends Controller
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email,' . $user->_id,
+            'email' => 'required|email|unique:users,email,' . (string) $user->_id,
             'phone' => 'nullable|string|max:20',
             'password' => 'nullable|string|min:6',
             'specialty' => $user->isTeacher() ? 'required|string|max:255' : 'nullable',

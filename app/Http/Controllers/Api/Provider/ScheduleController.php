@@ -1,12 +1,12 @@
 <?php
 
-namespace App\Http\Controllers\Api\Teacher;
+namespace App\Http\Controllers\Api\Provider;
 
 use App\Domain\Scheduling\VotingEngine;
 use App\Http\Controllers\Controller;
 use App\Models\Group;
 use App\Models\ScheduleOption;
-use App\Models\Teacher;
+use App\Models\Provider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -18,17 +18,17 @@ class ScheduleController extends Controller
     ) {}
 
     /**
-     * POST /api/v1/teacher/groups/{groupId}/schedule
+     * POST /api/v1/provider/groups/{groupId}/schedule
      * Proponer 3-5 fechas para la clase.
      */
     public function store(Request $request, string $groupId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
         $group = Group::with('course')->find($groupId);
 
-        if (!$group || (string) $group->course->teacher_id !== (string) $teacher->_id) {
+        if (!$group || (string) $group->course->provider_id !== (string) $provider->_id) {
             return response()->json(['message' => 'Grupo no encontrado o no te pertenece.', 'status' => 'error'], 404);
         }
 
@@ -66,16 +66,16 @@ class ScheduleController extends Controller
     }
 
     /**
-     * GET /api/v1/teacher/groups/{groupId}/votes
+     * GET /api/v1/provider/groups/{groupId}/votes
      */
     public function votes(Request $request, string $groupId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
         $group = Group::with('course')->find($groupId);
 
-        if (!$group || (string) $group->course->teacher_id !== (string) $teacher->_id) {
+        if (!$group || (string) $group->course->provider_id !== (string) $provider->_id) {
             return response()->json(['message' => 'Grupo no encontrado o no te pertenece.', 'status' => 'error'], 404);
         }
 
@@ -93,16 +93,16 @@ class ScheduleController extends Controller
     }
 
     /**
-     * GET /api/v1/teacher/groups/{groupId}/winning-date
+     * GET /api/v1/provider/groups/{groupId}/winning-date
      */
     public function winningDate(Request $request, string $groupId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
         $group = Group::with('course')->find($groupId);
 
-        if (!$group || (string) $group->course->teacher_id !== (string) $teacher->_id) {
+        if (!$group || (string) $group->course->provider_id !== (string) $provider->_id) {
             return response()->json(['message' => 'Grupo no encontrado o no te pertenece.', 'status' => 'error'], 404);
         }
 

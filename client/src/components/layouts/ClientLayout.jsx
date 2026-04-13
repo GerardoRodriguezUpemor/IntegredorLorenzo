@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { LogOut, BookOpen, UserCircle } from 'lucide-react';
 
 const StudentLayout = () => {
-  const { user, logout } = useAuth();
+  const { logout } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {

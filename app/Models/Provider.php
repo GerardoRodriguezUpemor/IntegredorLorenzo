@@ -5,12 +5,12 @@ namespace App\Models;
 use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Teacher extends Model
+class Provider extends Model
 {
     use HasFactory;
 
     protected $connection = 'mongodb';
-    protected $collection = 'teachers';
+    protected $collection = 'providers';
 
     protected $fillable = [
         'user_id',
@@ -21,7 +21,7 @@ class Teacher extends Model
     ];
 
     /**
-     * El usuario (cuenta) de este teacher.
+     * El usuario (cuenta) de este proveedor.
      */
     public function user()
     {
@@ -29,7 +29,7 @@ class Teacher extends Model
     }
 
     /**
-     * Los cursos de este teacher.
+     * Los servicios/cursos de este proveedor.
      */
     public function courses()
     {

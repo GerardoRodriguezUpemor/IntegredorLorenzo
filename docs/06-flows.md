@@ -142,6 +142,25 @@ Este documento describe, paso a paso, cada interacción posible dentro de la pla
 
 ---
 
+### Ver Conversión de Divisas (API Externa)
+
+```
+11. Durante el Checkout, la interfaz consume una segunda API
+    
+    GET /api/v1/exchange-rate
+    → Backend consume exchangerate-api.com (Cache 24h)
+    → Frontend recibe: { rate: 0.058 }
+    
+    En pantalla se muestra un badge dinámico:
+    "≈ $12.34 USD (Precio real en MXN: $200.00)"
+    
+    Cumple requisito: Middleware + Consumo de 2 APIs funcionales.
+```
+
+---
+
+---
+
 ## 👨‍🏫 FLUJO DEL PROFESOR
 
 ### Acceso al Panel
@@ -255,6 +274,20 @@ Este documento describe, paso a paso, cada interacción posible dentro de la pla
         Si current_count === 5: botón VERDE "Descargar Recibo PDF" ✓
     
     La clase queda "inicializada" solo cuando el grupo tiene 5/5 alumnos.
+```
+
+---
+
+### Borrado Lógico de Cursos
+
+```
+11. Si el curso está en DRAFT o REJECTED, el Profesor puede eliminarlo.
+    
+    DELETE /api/v1/teacher/courses/{id}
+    
+    Backend (Trait SoftDeletes):
+    → Agrega `deleted_at` timestamp al documento en MongoDB.
+    → Eloquent filtra automáticamente los eliminados en futuras consultas.
 ```
 
 ---

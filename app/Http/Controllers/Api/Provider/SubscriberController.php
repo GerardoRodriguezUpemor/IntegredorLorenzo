@@ -1,27 +1,27 @@
 <?php
 
-namespace App\Http\Controllers\Api\Teacher;
+namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Group;
 use App\Models\Reservation;
-use App\Models\Teacher;
+use App\Models\Provider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class SubscriberController extends Controller
 {
     /**
-     * GET /api/v1/teacher/courses/{courseId}/subscribers
+     * GET /api/v1/provider/courses/{courseId}/subscribers
      */
     public function index(Request $request, string $courseId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
         $course = Course::where('_id', $courseId)
-            ->where('teacher_id', (string) $teacher->_id)
+            ->where('provider_id', (string) $provider->_id)
             ->with('groups')
             ->first();
 

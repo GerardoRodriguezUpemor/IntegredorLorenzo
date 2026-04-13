@@ -7,7 +7,7 @@ use App\Models\Course;
 use App\Models\Group;
 use App\Models\Reservation;
 use App\Models\ScheduleOption;
-use App\Models\Teacher;
+use App\Models\Provider;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Carbon\Carbon;
@@ -18,14 +18,14 @@ class DatabaseSeeder extends Seeder
     {
         // 1. Limpieza total de la base de datos
         User::truncate();
-        Teacher::truncate();
+        Provider::truncate();
         Course::truncate();
         Group::truncate();
         ScheduleOption::truncate();
         Reservation::truncate();
         AuditLog::truncate();
 
-        echo "🚀 Preparando escenario de prueba: 4 alumnos inscritos en 1 curso de Vertiz...\n";
+        echo "🚀 Preparando escenario de prueba: 4 clientes inscritos en 1 servicio de Vertiz...\n";
 
         // 2. Crear Administrador
         $admin = User::create([
@@ -35,26 +35,26 @@ class DatabaseSeeder extends Seeder
             'role' => 'ADMIN',
         ]);
 
-        // 3. Crear Profesor Vertiz
+        // 3. Crear Proveedor Vertiz
         $userVertiz = User::create([
-            'name' => 'Profesor Vertiz',
+            'name' => 'Proveedor Vertiz',
             'email' => 'vertiz@ep4.edu',
             'password' => 'teacher123',
-            'role' => 'TEACHER',
+            'role' => 'PROVIDER',
         ]);
 
-        $teacherVertiz = Teacher::create([
+        $providerVertiz = Provider::create([
             'user_id' => (string) $userVertiz->_id,
-            'name' => 'Profesor Vertiz',
+            'name' => 'Proveedor Vertiz',
             'email' => 'vertiz@ep4.edu',
             'specialty' => 'Ingeniería de Software',
         ]);
 
-        // 4. Crear 1 Curso Autorizado
+        // 4. Crear 1 Servicio Autorizado
         $course = Course::create([
             'name' => 'Pruebas de Software Avanzadas',
             'description' => 'Aprende TDD, BDD y arquitecturas limpias para crear software robusto.',
-            'teacher_id' => (string) $teacherVertiz->_id,
+            'provider_id' => (string) $providerVertiz->_id,
             'status' => 'APPROVED',
             'approved_by' => (string) $admin->_id,
             'approved_at' => now(),
@@ -85,20 +85,20 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // 7. Crear 4 Estudiantes y sus inscripciones (PAID)
-        $studentsData = [
-            ['name' => 'Carlos García', 'email' => 'carlos@estudiante.edu'],
-            ['name' => 'María López', 'email' => 'maria@estudiante.edu'],
-            ['name' => 'Juan Hernández', 'email' => 'juan@estudiante.edu'],
-            ['name' => 'Ana Martínez', 'email' => 'ana@estudiante.edu'],
+        // 7. Crear 4 Clientes y sus inscripciones (PAID)
+        $clientsData = [
+            ['name' => 'Carlos García', 'email' => 'carlos@cliente.edu'],
+            ['name' => 'María López', 'email' => 'maria@cliente.edu'],
+            ['name' => 'Juan Hernández', 'email' => 'juan@cliente.edu'],
+            ['name' => 'Ana Martínez', 'email' => 'ana@cliente.edu'],
         ];
 
-        foreach ($studentsData as $index => $sd) {
+        foreach ($clientsData as $index => $cd) {
             $user = User::create([
-                'name' => $sd['name'],
-                'email' => $sd['email'],
+                'name' => $cd['name'],
+                'email' => $cd['email'],
                 'password' => 'student123',
-                'role' => 'STUDENT',
+                'role' => 'CLIENT',
             ]);
 
             // Crear Reservación PAGADA
@@ -113,17 +113,25 @@ class DatabaseSeeder extends Seeder
             ]);
         }
 
-        // Estudiante extra (el que usará Gerardo para entrar)
+        // 8. Crear 1 Servicio PENDIENTE de Aprobación
+        Course::create([
+            'name' => 'Inteligencia Artificial con Python',
+            'description' => 'Un curso práctico para crear redes neuronales y modelos de machine learning.',
+            'provider_id' => (string) $providerVertiz->_id,
+            'status' => 'PENDING_APPROVAL',
+        ]);
+
+        // Cliente extra (el que usará Gerardo para entrar)
         User::create([
-            'name' => 'Gerardo Estudiante',
-            'email' => 'gerardo@estudiante.edu',
+            'name' => 'Gerardo Cliente',
+            'email' => 'gerardo@cliente.edu',
             'password' => 'student123',
-            'role' => 'STUDENT',
+            'role' => 'CLIENT',
         ]);
 
         echo "\n✅ Escenario listo. \n";
-        echo "Materias: 1 (Vertiz) \n";
+        echo "Servicios: 1 (Vertiz) \n";
         echo "Grupo: {$group->name} (4/5 inscritos) \n";
-        echo "Entra con: gerardo@estudiante.edu (pass: student123) para ser el 5to.\n";
+        echo "Entra con: gerardo@cliente.edu (pass: student123) para ser el 5to.\n";
     }
 }

@@ -16,13 +16,13 @@ class CourseApprovalController extends Controller
     public function pending(Request $request): JsonResponse
     {
         $courses = Course::pendingApproval()
-            ->with('teacher')
+            ->with('provider')
             ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
             'data' => $courses,
-            'message' => 'Cursos pendientes de aprobación.',
+            'message' => 'Servicios pendientes de aprobación.',
             'status' => 'success',
         ]);
     }
@@ -34,7 +34,7 @@ class CourseApprovalController extends Controller
     {
         $status = $request->query('status');
 
-        $query = Course::with('teacher');
+        $query = Course::with('provider');
 
         if ($status) {
             $query->where('status', strtoupper($status));
@@ -44,7 +44,7 @@ class CourseApprovalController extends Controller
 
         return response()->json([
             'data' => $courses,
-            'message' => 'Lista de cursos.',
+            'message' => 'Lista de servicios.',
             'status' => 'success',
         ]);
     }
@@ -57,12 +57,12 @@ class CourseApprovalController extends Controller
         $course = Course::find($courseId);
 
         if (!$course) {
-            return response()->json(['message' => 'Curso no encontrado.', 'status' => 'error'], 404);
+            return response()->json(['message' => 'Servicio no encontrado.', 'status' => 'error'], 404);
         }
 
         if ($course->status !== 'PENDING_APPROVAL') {
             return response()->json([
-                'message' => "El curso no está pendiente de aprobación (status actual: {$course->status}).",
+                'message' => "El servicio no está pendiente de aprobación (status actual: {$course->status}).",
                 'status' => 'error',
             ], 409);
         }
@@ -84,8 +84,8 @@ class CourseApprovalController extends Controller
         );
 
         return response()->json([
-            'data' => $course->fresh()->load('teacher'),
-            'message' => 'Curso aprobado exitosamente.',
+            'data' => $course->fresh()->load('provider'),
+            'message' => 'Servicio aprobado exitosamente.',
             'status' => 'success',
         ]);
     }
@@ -98,7 +98,7 @@ class CourseApprovalController extends Controller
         $course = Course::find($courseId);
 
         if (!$course) {
-            return response()->json(['message' => 'Curso no encontrado.', 'status' => 'error'], 404);
+            return response()->json(['message' => 'Servicio no encontrado.', 'status' => 'error'], 404);
         }
 
         if ($course->status !== 'PENDING_APPROVAL') {
@@ -125,8 +125,21 @@ class CourseApprovalController extends Controller
 
         return response()->json([
             'data' => $course->fresh(),
-            'message' => 'Curso rechazado.',
+            'message' => 'Servicio rechazado.',
             'status' => 'success',
         ]);
+    }
+
+    /**
+     * GET /api/v1/admin/courses/report
+     */
+    public function downloadReport(Request $request, \App\Infrastructure\Pdf\AdminCourseReportPdfGenerator $generator)
+    {
+        $courses = Course::orderBy('name', 'asc')->get();
+        $pdfContent = $generator->generate($courses);
+
+        return response($pdfContent)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="catalogo_servicios_ep4.pdf"');
     }
 }

@@ -90,14 +90,14 @@ const MyCourses = () => {
   return (
     <div className="fade-in">
       <div style={{ marginBottom: '2.5rem' }}>
-        <h1 className="title" style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>Mis Cursos Suscritos</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Historial de tus grupos asegurados y recibos de compra.</p>
+        <h1 className="title" style={{ fontSize: '2.2rem', marginBottom: '0.5rem' }}>Mis Servicios Adquiridos</h1>
+        <p style={{ color: 'var(--text-muted)' }}>Historial de tus servicios asegurados y recibos de compra.</p>
       </div>
 
       {courses.length === 0 ? (
         <div className="glass-panel" style={{ padding: '3rem', textAlign: 'center', color: 'var(--text-muted)' }}>
           <BookOpen size={48} style={{ margin: '0 auto 1rem auto', opacity: 0.5 }} />
-          <h3>Aún no estás suscrito a ningún curso.</h3>
+          <h3>Aún no has adquirido ningún servicio.</h3>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
@@ -110,7 +110,7 @@ const MyCourses = () => {
                 </div>
                 <div>
                   <h3 style={{ fontSize: '1.3rem', marginBottom: '0.3rem' }}>{sub.course.name}</h3>
-                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Instructor: {sub.course.teacher}</p>
+                  <p style={{ color: 'var(--text-muted)', fontSize: '0.9rem' }}>Proveedor: {sub.course.teacher}</p>
                 </div>
               </div>
 

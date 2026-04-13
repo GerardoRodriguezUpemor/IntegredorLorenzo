@@ -119,12 +119,12 @@
 <body>
     <div class="header">
         <h1>EP4 MICROCOHORTS</h1>
-        <p>Plataforma Educativa de Micro-Grupos</p>
+        <p>Plataforma de Soluciones de Micro-Grupos</p>
         <div class="badge">✓ PAGO CONFIRMADO</div>
     </div>
 
     <div class="section">
-        <div class="section-title">Datos del Estudiante</div>
+        <div class="section-title">Datos del Cliente</div>
         <div class="info-grid">
             <div class="info-row">
                 <div class="info-label">Nombre:</div>
@@ -138,10 +138,10 @@
     </div>
 
     <div class="section">
-        <div class="section-title">Datos del Curso</div>
+        <div class="section-title">Datos del Servicio</div>
         <div class="info-grid">
             <div class="info-row">
-                <div class="info-label">Curso:</div>
+                <div class="info-label">Servicio:</div>
                 <div class="info-value">{{ $course->name }}</div>
             </div>
             <div class="info-row">
@@ -149,7 +149,7 @@
                 <div class="info-value">{{ $course->description }}</div>
             </div>
             <div class="info-row">
-                <div class="info-label">Profesor:</div>
+                <div class="info-label">Proveedor:</div>
                 <div class="info-value">{{ $teacher->name }} ({{ $teacher->specialty }})</div>
             </div>
             <div class="info-row">

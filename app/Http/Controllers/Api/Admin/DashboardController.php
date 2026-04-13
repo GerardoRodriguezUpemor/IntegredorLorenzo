@@ -19,11 +19,11 @@ class DashboardController extends Controller
     public function index(Request $request): JsonResponse
     {
         $totalUsers = User::count();
-        $totalStudents = User::where('role', 'STUDENT')->count();
-        $totalTeachers = User::where('role', 'TEACHER')->count();
-        $totalCourses = Course::count();
-        $approvedCourses = Course::where('status', 'APPROVED')->count();
-        $pendingCourses = Course::where('status', 'PENDING_APPROVAL')->count();
+        $totalClients = User::where('role', 'CLIENT')->count();
+        $totalProviders = User::where('role', 'PROVIDER')->count();
+        $totalServices = Course::count();
+        $approvedServices = Course::where('status', 'APPROVED')->count();
+        $pendingServices = Course::where('status', 'PENDING_APPROVAL')->count();
         $totalGroups = Group::count();
         $activeGroups = Group::whereIn('status', ['OPEN', 'RESERVED'])->count();
         $fullGroups = Group::where('status', 'FULL')->count();
@@ -49,13 +49,13 @@ class DashboardController extends Controller
             'data' => [
                 'users' => [
                     'total' => $totalUsers,
-                    'students' => $totalStudents,
-                    'teachers' => $totalTeachers,
+                    'clients' => $totalClients,
+                    'providers' => $totalProviders,
                 ],
-                'courses' => [
-                    'total' => $totalCourses,
-                    'approved' => $approvedCourses,
-                    'pending' => $pendingCourses,
+                'services' => [
+                    'total' => $totalServices,
+                    'approved' => $approvedServices,
+                    'pending' => $pendingServices,
                 ],
                 'groups' => [
                     'total' => $totalGroups,

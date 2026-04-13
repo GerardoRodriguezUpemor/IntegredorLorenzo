@@ -12,6 +12,7 @@ const Checkout = () => {
   const [group, setGroup] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [timeLeft, setTimeLeft] = useState(5 * 60); // 5 minutes in seconds
+  const [exchangeRate, setExchangeRate] = useState(0.05); // Fallback: 1 MXN = 0.05 USD
   const [reserving, setReserving] = useState(false);
   const [reserved, setReserved] = useState(false);
 
@@ -22,12 +23,19 @@ const Checkout = () => {
         const reqPricing = fetch(`http://127.0.0.1:8000/api/v1/groups/${groupId}/pricing`, { headers: { 'Accept': 'application/json', 'X-User-Id': user._id }});
         // Fetch schedule options
         const reqSchedule = fetch(`http://127.0.0.1:8000/api/v1/groups/${groupId}/schedule`, { headers: { 'Accept': 'application/json', 'X-User-Id': user._id }});
+        // Fetch exchange rate (API 2)
+        const reqRate = fetch(`http://127.0.0.1:8000/api/v1/exchange-rate`, { headers: { 'Accept': 'application/json', 'X-User-Id': user._id }});
 
-        const [resPricing, resSchedule] = await Promise.all([reqPricing, reqSchedule]);
+        const [resPricing, resSchedule, resRate] = await Promise.all([reqPricing, reqSchedule, reqRate]);
 
         if (resPricing.ok && resSchedule.ok) {
           const jsonPricing = await resPricing.json();
           const jsonSchedule = await resSchedule.json();
+          
+          if (resRate.ok) {
+            const jsonRate = await resRate.json();
+            setExchangeRate(jsonRate.rate);
+          }
 
           setGroup({
             _id: groupId,
@@ -44,9 +52,7 @@ const Checkout = () => {
             }))
           });
         }
-      } catch (e) {
-        console.error("Fetch Checkout Data Error", e);
-      } finally {
+    } catch { console.error("Fetch Checkout Data Error"); } finally {
         setLoading(false);
       }
     };
@@ -57,7 +63,7 @@ const Checkout = () => {
     if (!reserved) return;
     if (timeLeft <= 0) {
       alert("Tu tiempo de pago ha expirado. Lugar liberado.");
-      navigate('/student/courses');
+      navigate('/client/services');
       return;
     }
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
@@ -94,7 +100,7 @@ const Checkout = () => {
       } else {
         alert(data.message || 'Error al reservar el asiento.');
       }
-    } catch (e) {
+    } catch {
       alert('Error de conexión');
     } finally {
       setReserving(false);
@@ -111,11 +117,11 @@ const Checkout = () => {
       const data = await res.json();
       if (res.ok) {
         alert('¡Pago Confirmado Exitosamente! Ya estás inscrito.');
-        navigate('/student/my-courses');
+        navigate('/client/my-services');
       } else {
         alert(data.message || 'El pago no pudo procesarse');
       }
-    } catch (e) {
+    } catch {
       alert('Error confirmando el pago');
     }
   };
@@ -132,7 +138,7 @@ const Checkout = () => {
 
   return (
     <div className="fade-in" style={{ maxWidth: '900px', margin: '0 auto' }}>
-      <button onClick={() => navigate('/student/courses')} className="btn btn-outline" style={{ border: 'none', padding: 0, marginBottom: '2rem', color: 'var(--text-muted)' }}>
+      <button onClick={() => navigate('/client/services')} className="btn btn-outline" style={{ border: 'none', padding: 0, marginBottom: '2rem', color: 'var(--text-muted)' }}>
         <ArrowLeft size={20} /> Volver al catálogo
       </button>
 
@@ -141,12 +147,17 @@ const Checkout = () => {
         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
           <div className="glass-panel" style={{ padding: '2rem' }}>
             <h1 style={{ fontSize: '1.8rem', marginBottom: '0.5rem' }}>{group.name}</h1>
-            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Instructor: {group.teacher}</p>
+            <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>Proveedor: {group.teacher}</p>
 
             <div style={{ background: 'var(--primary-glow)', padding: '1rem', borderRadius: 'var(--radius-sm)', border: '1px solid var(--primary)', marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
                 <p style={{ fontSize: '0.9rem', color: '#ccc' }}>Precio Reservado</p>
-                <h2 style={{ fontSize: '2rem', color: 'white', margin: 0 }}>${group.priceBreakdown.currentPrice}</h2>
+                <h2 style={{ fontSize: '2rem', color: 'white', margin: 0 }}>
+                  ${group.priceBreakdown.currentPrice} <small style={{ fontSize: '1rem', color: 'var(--success)', opacity: 0.8 }}>MXN</small>
+                </h2>
+                <div style={{ marginTop: '0.5rem', padding: '0.4rem 0.8rem', background: 'rgba(255,255,255,0.1)', borderRadius: 'var(--radius-sm)', display: 'inline-block', fontSize: '0.85rem' }}>
+                  ≈ ${(group.priceBreakdown.currentPrice * exchangeRate).toFixed(2)} USD
+                </div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 {/* Funcionalidad dinámica oculta por ahora */}
@@ -194,7 +205,7 @@ const Checkout = () => {
               <>
                 <h3 style={{ fontSize: '1.3rem', marginBottom: '1.5rem' }}>Resumen</h3>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1rem', color: 'var(--text-muted)' }}>
-                  <span>Curso</span>
+                  <span>Servicio</span>
                   <span>{group.name}</span>
                 </div>
                 <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '2rem', color: 'var(--text-muted)' }}>

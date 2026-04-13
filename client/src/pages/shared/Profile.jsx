@@ -53,13 +53,21 @@ const Profile = () => {
     setMessage({ type: '', text: '' });
 
     try {
+      // Solo enviamos el campo password si el usuario escribió algo en él
+      // para evitar errores de validación de longitud mínima (min:6)
+      const submitData = { ...formData };
+      if (!submitData.password) {
+        delete submitData.password;
+      }
+
       const res = await fetch('http://127.0.0.1:8000/api/v1/profile', {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           'X-User-Id': user.id || user._id
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(submitData)
       });
 
       const json = await res.json();
@@ -87,107 +95,143 @@ const Profile = () => {
   if (loading) return <div className="spinner-container"><div className="spinner"></div></div>;
 
   return (
-    <div className="fade-in" style={{ maxWidth: '800px', margin: '0 auto' }}>
-      <div style={{ marginBottom: '2rem' }}>
-        <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Mi Perfil</h1>
-        <p style={{ color: 'var(--text-muted)' }}>Gestiona tu información personal y seguridad de la cuenta.</p>
-      </div>
-
-      <div className="glass-panel" style={{ padding: '2rem', marginBottom: '2rem', display: 'flex', gap: '2rem', alignItems: 'center' }}>
-        <div style={{ 
-          width: '100px', 
-          height: '100px', 
-          borderRadius: '50%', 
-          background: 'linear-gradient(45deg, var(--primary), var(--secondary))',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: '2.5rem',
-          fontWeight: 'bold',
-          color: 'white',
-          boxShadow: '0 0 20px var(--primary-glow)'
-        }}>
-          {getInitials(formData.name)}
+    <div className="fade-in" style={{ maxWidth: '1000px', margin: '0 auto', paddingBottom: '4rem' }}>
+      
+      {/* HEADER SECTION */}
+      <div className="profile-header-grid">
+        <div className="avatar-container">
+          <div className="avatar-ring"></div>
+          <div className="avatar-main">
+            {getInitials(formData.name)}
+          </div>
         </div>
         <div>
-          <h2 style={{ margin: 0 }}>{formData.name}</h2>
-          <span className="badge badge-primary">{user?.role}</span>
-          <p style={{ marginTop: '0.5rem', color: 'var(--text-muted)' }}>Desde este panel puedes mantener tus datos al día.</p>
+          <h1 className="title" style={{ fontSize: '3rem', marginBottom: '0.5rem' }}>{formData.name}</h1>
+          <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+            <span className="badge badge-primary" style={{ padding: '0.5rem 1.2rem', fontSize: '0.85rem' }}>
+              {user?.role === 'STUDENT' ? '🎓 Estudiante' : (user?.role === 'TEACHER' ? '👨‍🏫 Profesor' : '🛡️ Administrador')}
+            </span>
+            <span style={{ color: 'var(--text-muted)', fontSize: '0.9rem', display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
+              <Mail size={14} /> {formData.email}
+            </span>
+          </div>
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+      <form onSubmit={handleSubmit}>
         {message.text && (
-          <div className={`badge ${message.type === 'success' ? 'badge-success' : 'badge-danger'}`} style={{ padding: '1rem', width: '100%', textAlign: 'center' }}>
+          <div className={`badge ${message.type === 'success' ? 'badge-success' : 'badge-danger'}`} 
+               style={{ padding: '1.2rem', width: '100%', textAlign: 'center', marginBottom: '2rem', borderRadius: 'var(--radius-md)', fontSize: '1rem' }}>
             {message.text}
           </div>
         )}
 
-        <div className="grid grid-cols-2 gap-4">
-          <div className="input-group">
-            <label><User size={16}/> Nombre Completo</label>
-            <input 
-              type="text" 
-              className="glass-input" 
-              value={formData.name}
-              onChange={(e) => setFormData({...formData, name: e.target.value})}
-              required 
-            />
-          </div>
-          <div className="input-group">
-            <label><Mail size={16}/> Correo Electrónico</label>
-            <input 
-              type="email" 
-              className="glass-input" 
-              value={formData.email}
-              onChange={(e) => setFormData({...formData, email: e.target.value})}
-              required 
-            />
-          </div>
-          <div className="input-group">
-            <label><Phone size={16}/> Teléfono de Contacto</label>
-            <input 
-              type="text" 
-              className="glass-input" 
-              placeholder="+52 ..."
-              value={formData.phone}
-              onChange={(e) => setFormData({...formData, phone: e.target.value})}
-            />
-          </div>
+        <div className="grid grid-cols-1 gap-6">
           
-          {user?.role === 'TEACHER' && (
-            <div className="input-group">
-              <label><Award size={16}/> Especialidad Académica</label>
-              <input 
-                type="text" 
-                className="glass-input" 
-                value={formData.specialty}
-                onChange={(e) => setFormData({...formData, specialty: e.target.value})}
-                required 
-              />
+          {/* PERSONAL INFO CARD */}
+          <div className="section-card">
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--primary)' }}>
+              <User size={24} /> Información Personal
+            </h3>
+            
+            <div className="grid grid-cols-2 gap-6">
+              <div className="glass-input-group">
+                <label className="glass-input-label">Nombre Completo</label>
+                <div className="glass-input-wrapper">
+                  <User size={18} />
+                  <input 
+                    type="text" 
+                    className="glass-input" 
+                    value={formData.name}
+                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                    placeholder="Tu nombre real"
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div className="glass-input-group">
+                <label className="glass-input-label">Correo Electrónico</label>
+                <div className="glass-input-wrapper">
+                  <Mail size={18} />
+                  <input 
+                    type="email" 
+                    className="glass-input" 
+                    value={formData.email}
+                    onChange={(e) => setFormData({...formData, email: e.target.value})}
+                    placeholder="ejemplo@correo.com"
+                    required 
+                  />
+                </div>
+              </div>
+
+              <div className="glass-input-group">
+                <label className="glass-input-label">Teléfono de Contacto</label>
+                <div className="glass-input-wrapper">
+                  <Phone size={18} />
+                  <input 
+                    type="text" 
+                    className="glass-input" 
+                    value={formData.phone}
+                    onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                    placeholder="+52 000 000 0000"
+                  />
+                </div>
+              </div>
+
+              {user?.role === 'PROVIDER' && (
+                <div className="glass-input-group">
+                  <label className="glass-input-label">Especialidad / Giro</label>
+                  <div className="glass-input-wrapper">
+                    <Award size={18} />
+                    <input 
+                      type="text" 
+                      className="glass-input" 
+                      value={formData.specialty}
+                      onChange={(e) => setFormData({...formData, specialty: e.target.value})}
+                      placeholder="Ej. Consultoría, Software, etc."
+                      required 
+                    />
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-
-        <div className="glass-panel" style={{ padding: '1.5rem', marginTop: '1rem' }}>
-          <h3 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1.5rem' }}>
-            <Shield size={20} color="var(--warning)" /> Seguridad de la Cuenta
-          </h3>
-          <div className="input-group">
-            <label><Lock size={16}/> Nueva Contraseña (dejar en blanco para no cambiar)</label>
-            <input 
-              type="password" 
-              className="glass-input" 
-              value={formData.password}
-              onChange={(e) => setFormData({...formData, password: e.target.value})}
-              placeholder="••••••••"
-            />
           </div>
-        </div>
 
-        <button type="submit" className="btn btn-primary" disabled={saving} style={{ width: '100%', padding: '1.2rem', fontSize: '1.1rem' }}>
-          {saving ? 'Guardando cambios...' : <><Save size={20}/> Guardar Perfil</>}
-        </button>
+          {/* SECURITY CARD */}
+          <div className="section-card">
+            <h3 style={{ fontSize: '1.5rem', marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '0.8rem', color: 'var(--warning)' }}>
+              <Shield size={24} /> Seguridad de la Cuenta
+            </h3>
+            
+            <div className="glass-input-group" style={{ marginBottom: 0 }}>
+              <label className="glass-input-label">Nueva Contraseña</label>
+              <div className="glass-input-wrapper">
+                <Lock size={18} />
+                <input 
+                  type="password" 
+                  className="glass-input" 
+                  value={formData.password}
+                  onChange={(e) => setFormData({...formData, password: e.target.value})}
+                  placeholder="•••••••• (dejar en blanco para no cambiar)"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* ACTIONS */}
+          <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+            <button type="submit" className="btn btn-primary" disabled={saving} 
+                    style={{ flex: 1, padding: '1.5rem', fontSize: '1.2rem', borderRadius: 'var(--radius-lg)' }}>
+              {saving ? (
+                <><div className="spinner" style={{ marginRight: '10px' }}></div> Guardando...</>
+              ) : (
+                <><Save size={24} style={{ marginRight: '10px' }}/> Actualizar Perfil Profresional</>
+              )}
+            </button>
+          </div>
+
+        </div>
       </form>
     </div>
   );

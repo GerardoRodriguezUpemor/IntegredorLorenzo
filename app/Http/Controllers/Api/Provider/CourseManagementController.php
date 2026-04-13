@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers\Api\Teacher;
+namespace App\Http\Controllers\Api\Provider;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
 use App\Models\Group;
-use App\Models\Teacher;
+use App\Models\Provider;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -13,31 +13,31 @@ use Illuminate\Support\Facades\Validator;
 class CourseManagementController extends Controller
 {
     /**
-     * GET /api/v1/teacher/courses
+     * GET /api/v1/provider/courses
      */
     public function index(Request $request): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
-        if (!$teacher) {
-            return response()->json(['message' => 'Perfil de teacher no encontrado.', 'status' => 'error'], 404);
+        if (!$provider) {
+            return response()->json(['message' => 'Perfil de proveedor no encontrado.', 'status' => 'error'], 404);
         }
 
-        $courses = Course::where('teacher_id', (string) $teacher->_id)
+        $courses = Course::where('provider_id', (string) $provider->_id)
             ->with('groups')
             ->orderBy('created_at', 'desc')
             ->get();
 
         return response()->json([
             'data' => $courses,
-            'message' => 'Mis cursos.',
+            'message' => 'Mis servicios/cursos.',
             'status' => 'success',
         ]);
     }
 
     /**
-     * POST /api/v1/teacher/courses
+     * POST /api/v1/provider/courses
      */
     public function store(Request $request): JsonResponse
     {
@@ -56,16 +56,16 @@ class CourseManagementController extends Controller
         }
 
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
 
-        if (!$teacher) {
-            return response()->json(['message' => 'Perfil de teacher no encontrado.', 'status' => 'error'], 404);
+        if (!$provider) {
+            return response()->json(['message' => 'Perfil de proveedor no encontrado.', 'status' => 'error'], 404);
         }
 
         $course = Course::create([
             'name' => $request->name,
             'description' => $request->description,
-            'teacher_id' => (string) $teacher->_id,
+            'provider_id' => (string) $provider->_id,
             'status' => 'DRAFT',
         ]);
 
@@ -83,29 +83,29 @@ class CourseManagementController extends Controller
 
         return response()->json([
             'data' => $course->load('groups'),
-            'message' => 'Curso creado como borrador. Usa /submit para enviarlo a revisión.',
+            'message' => 'Servicio creado como borrador. Usa /submit para enviarlo a revisión.',
             'status' => 'success',
         ], 201);
     }
 
     /**
-     * PUT /api/v1/teacher/courses/{courseId}
+     * PUT /api/v1/provider/courses/{courseId}
      */
     public function update(Request $request, string $courseId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
         $course = Course::where('_id', $courseId)
-            ->where('teacher_id', (string) $teacher->_id)
+            ->where('teacher_id', (string) $provider->_id)
             ->first();
 
         if (!$course) {
-            return response()->json(['message' => 'Curso no encontrado.', 'status' => 'error'], 404);
+            return response()->json(['message' => 'Servicio no encontrado.', 'status' => 'error'], 404);
         }
 
         if (!in_array($course->status, ['DRAFT', 'REJECTED'])) {
             return response()->json([
-                'message' => 'Solo puedes editar cursos en borrador o rechazados.',
+                'message' => 'Solo puedes editar servicios en borrador o rechazados.',
                 'status' => 'error',
             ], 409);
         }
@@ -114,29 +114,29 @@ class CourseManagementController extends Controller
 
         return response()->json([
             'data' => $course->fresh(),
-            'message' => 'Curso actualizado.',
+            'message' => 'Servicio actualizado.',
             'status' => 'success',
         ]);
     }
 
     /**
-     * PATCH /api/v1/teacher/courses/{courseId}/submit
+     * PATCH /api/v1/provider/courses/{courseId}/submit
      */
     public function submit(Request $request, string $courseId): JsonResponse
     {
         $user = $request->attributes->get('authenticated_user');
-        $teacher = Teacher::where('user_id', (string) $user->_id)->first();
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
         $course = Course::where('_id', $courseId)
-            ->where('teacher_id', (string) $teacher->_id)
+            ->where('teacher_id', (string) $provider->_id)
             ->first();
 
         if (!$course) {
-            return response()->json(['message' => 'Curso no encontrado.', 'status' => 'error'], 404);
+            return response()->json(['message' => 'Servicio no encontrado.', 'status' => 'error'], 404);
         }
 
         if (!in_array($course->status, ['DRAFT', 'REJECTED'])) {
             return response()->json([
-                'message' => 'Solo puedes enviar a revisión cursos en borrador o rechazados.',
+                'message' => 'Solo puedes enviar a revisión servicios en borrador o rechazados.',
                 'status' => 'error',
             ], 409);
         }
@@ -148,7 +148,40 @@ class CourseManagementController extends Controller
 
         return response()->json([
             'data' => $course->fresh(),
-            'message' => 'Curso enviado a revisión. Un administrador lo evaluará.',
+            'message' => 'Servicio enviado a revisión. Un administrador lo evaluará.',
+            'status' => 'success',
+        ]);
+    }
+
+    /**
+     * DELETE /api/v1/provider/courses/{courseId}
+     */
+    public function destroy(Request $request, string $courseId): JsonResponse
+    {
+        $user = $request->attributes->get('authenticated_user');
+        $provider = Provider::where('user_id', (string) $user->_id)->first();
+        
+        $course = Course::where('_id', $courseId)
+            ->where('teacher_id', (string) $provider->_id)
+            ->first();
+
+        if (!$course) {
+            return response()->json(['message' => 'Servicio no encontrado.', 'status' => 'error'], 404);
+        }
+
+        // Solo permitir borrar si está en DRAFT o REJECTED por seguridad
+        // (Si está APPROVED o PENDING, requiere acción administrativa o cerrar inscripciones)
+        if (!in_array($course->status, ['DRAFT', 'REJECTED'])) {
+            return response()->json([
+                'message' => 'No puedes eliminar un registro que ya está publicado o en revisión.',
+                'status' => 'error'
+            ], 403);
+        }
+
+        $course->delete(); // Soft Delete
+
+        return response()->json([
+            'message' => 'Registro eliminado correctamente.',
             'status' => 'success',
         ]);
     }

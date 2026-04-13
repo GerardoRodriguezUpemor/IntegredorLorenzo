@@ -70,15 +70,15 @@ const Catalog = () => {
     <div className="fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
         <div>
-          <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Explorar Cohortes</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Cursos exclusivos. Topes estrictos de 5 alumnos. Precio único de $50.</p>
+          <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Explorar Servicios</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Servicios exclusivos. Cupos de 5 clientes. Inversión justa.</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
           <div className="glass-panel" style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', width: '300px' }}>
             <Search size={18} color="var(--text-muted)" style={{ marginRight: '0.5rem' }} />
             <input 
               type="text" 
-              placeholder="Buscar curso por nombre..." 
+              placeholder="Buscar servicio por nombre..." 
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               style={{ background: 'transparent', border: 'none', color: 'white', flex: 1, outline: 'none' }}
@@ -128,14 +128,14 @@ const Catalog = () => {
                 </div>
               </div>
               
-              <button 
-                className={`btn ${isFull ? 'btn-outline' : 'btn-primary'}`} 
-                style={{ margin: '1.5rem', marginTop: '0', padding: '1rem', borderRadius: 'var(--radius-sm)' }}
-                disabled={isFull}
-                onClick={() => navigate(`/student/checkout/${group._id}`)}
-              >
-                {isFull ? 'Agotado' : 'Asegurar mi lugar'} <ArrowRight size={18} />
-              </button>
+                <button 
+                  className={`btn ${isFull ? 'btn-outline' : 'btn-primary'}`} 
+                  style={{ margin: '1.5rem', marginTop: '0', padding: '1rem', borderRadius: 'var(--radius-sm)' }}
+                  disabled={isFull}
+                  onClick={() => navigate(`/client/checkout/${group._id}`)}
+                >
+                  {isFull ? 'Agotado' : 'Asegurar mi lugar'} <ArrowRight size={18} />
+                </button>
             </div>
           );
         })}

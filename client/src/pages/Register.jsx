@@ -5,7 +5,7 @@ import { BookOpen, Users, Rocket } from 'lucide-react';
 
 const Register = () => {
   const [searchParams] = useSearchParams();
-  const initialRole = searchParams.get('role') === 'TEACHER' ? 'TEACHER' : 'STUDENT';
+  const initialRole = searchParams.get('role') === 'PROVIDER' ? 'PROVIDER' : 'CLIENT';
   
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -23,9 +23,9 @@ const Register = () => {
       const payload = {
         name,
         email,
-        password: role === 'STUDENT' ? 'student123' : 'teacher123',
+        password: role === 'CLIENT' ? 'student123' : 'teacher123',
         role,
-        specialty: role === 'TEACHER' ? specialty : undefined
+        specialty: role === 'PROVIDER' ? specialty : undefined
       };
 
       const res = await fetch('http://127.0.0.1:8000/api/v1/auth/register', {
@@ -48,10 +48,10 @@ const Register = () => {
 
       login(realUser);
       
-      if (role === 'STUDENT') navigate('/student/courses');
-      else navigate('/teacher/dashboard');
+      if (role === 'CLIENT') navigate('/client/services');
+      else navigate('/provider/dashboard');
       
-    } catch (err) {
+    } catch {
       alert('Error de conexión al registrar');
     }
   };
@@ -69,19 +69,19 @@ const Register = () => {
         <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
           <button 
             type="button"
-            className={`btn ${role === 'STUDENT' ? 'btn-primary' : 'btn-outline'}`}
+            className={`btn ${role === 'CLIENT' ? 'btn-primary' : 'btn-outline'}`}
             style={{ flex: 1, padding: '1rem' }}
-            onClick={() => setRole('STUDENT')}
+            onClick={() => setRole('CLIENT')}
           >
-            <Rocket size={18} /> Alumno
+            <Rocket size={18} /> Cliente
           </button>
           <button 
             type="button"
-            className={`btn ${role === 'TEACHER' ? 'btn-primary' : 'btn-outline'}`}
+            className={`btn ${role === 'PROVIDER' ? 'btn-primary' : 'btn-outline'}`}
             style={{ flex: 1, padding: '1rem' }}
-            onClick={() => setRole('TEACHER')}
+            onClick={() => setRole('PROVIDER')}
           >
-            <Users size={18} /> Profesor
+            <Users size={18} /> Proveedor
           </button>
         </div>
 
@@ -110,13 +110,13 @@ const Register = () => {
             />
           </div>
 
-          {role === 'TEACHER' && (
+          {role === 'PROVIDER' && (
             <div className="form-group fade-in">
-              <label className="form-label">Especialidad</label>
+              <label className="form-label">Especialidad / Giro</label>
               <input 
                 type="text" 
                 className="form-input" 
-                placeholder="Ej. Matemáticas Avanzadas" 
+                placeholder="Ej. Consultoría, Software, etc." 
                 value={specialty}
                 onChange={(e) => setSpecialty(e.target.value)}
                 required

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Api\Student;
+namespace App\Http\Controllers\Api\Client;
 
 use App\Http\Controllers\Controller;
 use App\Models\Course;
@@ -10,8 +10,8 @@ use Illuminate\Http\Request;
 class CatalogController extends Controller
 {
     /**
-     * GET /api/v1/courses
-     * Ver catálogo de cursos aprobados (público).
+     * GET /api/v1/services
+     * Ver catálogo de servicios (público).
      */
     public function index(Request $request): JsonResponse
     {

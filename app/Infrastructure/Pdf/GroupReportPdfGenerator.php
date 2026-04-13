@@ -8,13 +8,13 @@ use Barryvdh\DomPDF\Facade\Pdf;
 class GroupReportPdfGenerator
 {
     /**
-     * Genera un reporte financiero de un grupo para el profesor.
+     * Genera un reporte financiero de un grupo para el proveedor.
      *
      * @return \Barryvdh\DomPDF\PDF
      */
     public function generate(Group $group)
     {
-        $group->load(['course.teacher', 'reservations.user']);
+        $group->load(['course.provider', 'reservations.user']);
 
         // Filtrar solo reservaciones pagadas
         $paidReservations = $group->reservations->filter(fn($r) => $r->status === 'PAID');
@@ -23,7 +23,7 @@ class GroupReportPdfGenerator
         $data = [
             'group' => $group,
             'course' => $group->course,
-            'teacher' => $group->course->teacher,
+            'teacher' => $group->course->provider,
             'reservations' => $paidReservations,
             'totalRevenue' => $totalRevenue,
             'generated_at' => now()->format('d/m/Y H:i:s'),

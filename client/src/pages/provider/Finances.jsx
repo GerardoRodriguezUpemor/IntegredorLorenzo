@@ -11,7 +11,7 @@ const Finances = () => {
   useEffect(() => {
     const fetchFinances = async () => {
       try {
-        const res = await fetch('http://127.0.0.1:8000/api/v1/teacher/courses', {
+        const res = await fetch('http://127.0.0.1:8000/api/v1/provider/courses', {
           headers: { 'Accept': 'application/json', 'X-User-Id': user._id }
         });
         if (res.ok) {
@@ -22,7 +22,7 @@ const Finances = () => {
           
           approved.forEach(async (c) => {
             const courseId = c._id || c.id;
-            const subRes = await fetch(`http://127.0.0.1:8000/api/v1/teacher/courses/${courseId}/subscribers`, {
+            const subRes = await fetch(`http://127.0.0.1:8000/api/v1/provider/courses/${courseId}/subscribers`, {
               headers: { 'Accept': 'application/json', 'X-User-Id': user._id }
             });
             if (subRes.ok) {
@@ -45,7 +45,7 @@ const Finances = () => {
 
   const handleDownloadPDF = async (groupId, groupName) => {
     try {
-      const response = await fetch(`http://127.0.0.1:8000/api/v1/teacher/groups/${groupId}/report`, {
+      const response = await fetch(`http://127.0.0.1:8000/api/v1/provider/groups/${groupId}/report`, {
         headers: { 
           'X-User-Id': user._id,
           'Accept': 'application/pdf'
@@ -112,7 +112,7 @@ const Finances = () => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <h4 style={{ margin: 0, fontSize: '1.2rem' }}>{group.name}</h4>
                         <span className={`badge ${isFull ? 'badge-success' : 'badge-warning'}`}>
-                          {group.current_count} / {group.max_capacity} Alumnos
+                          {group.current_count} / {group.max_capacity} Clientes
                         </span>
                       </div>
 

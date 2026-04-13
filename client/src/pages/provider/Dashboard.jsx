@@ -1,9 +1,10 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Plus, Send, Users, Activity, ExternalLink, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Send, Users, Activity, ExternalLink, Calendar as CalendarIcon, Trash2, Edit3 } from 'lucide-react';
 
-const TeacherDashboard = () => {
+const ProviderDashboard = () => {
+    // ... (rest of state stays the same)
   const { user } = useAuth();
   const navigate = useNavigate();
   const [courses, setCourses] = useState([]);
@@ -20,9 +21,9 @@ const TeacherDashboard = () => {
   
   const [dates, setDates] = useState(['', '', '']);
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     try {
-      const res = await fetch('http://127.0.0.1:8000/api/v1/teacher/courses', {
+      const res = await fetch('http://127.0.0.1:8000/api/v1/provider/courses', {
         headers: { 'Accept': 'application/json', 'X-User-Id': user._id }
       });
       if (res.ok) {
@@ -32,7 +33,7 @@ const TeacherDashboard = () => {
         // Fetch subscribers summary for each course
         json.data.forEach(async (c) => {
           const courseId = c._id || c.id;
-          const subRes = await fetch(`http://127.0.0.1:8000/api/v1/teacher/courses/${courseId}/subscribers`, {
+          const subRes = await fetch(`http://127.0.0.1:8000/api/v1/provider/courses/${courseId}/subscribers`, {
             headers: { 'Accept': 'application/json', 'X-User-Id': user._id }
           });
           if (subRes.ok) {
@@ -46,13 +47,13 @@ const TeacherDashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user._id]);
 
   useEffect(() => {
     if (user && user._id) {
       fetchCourses();
     }
-  }, [user]);
+  }, [user, fetchCourses]);
 
   const handleCreateCourse = async (e) => {
     e.preventDefault();
@@ -72,7 +73,7 @@ const TeacherDashboard = () => {
         const d = await res.json();
         alert(d.message);
       }
-    } catch (error) {
+    } catch {
       alert('Error connecting to API');
     }
   };
@@ -87,9 +88,26 @@ const TeacherDashboard = () => {
         alert('Curso mandado a revisión de administrador');
         fetchCourses();
       }
-    } catch (e) {
+    } catch {
       alert('Error');
     }
+  };
+
+  const handleDeleteCourse = async (courseId) => {
+    if (!window.confirm('¿Estás seguro de eliminar este curso borrador?')) return;
+    try {
+      const res = await fetch(`http://127.0.0.1:8000/api/v1/teacher/courses/${courseId}`, {
+        method: 'DELETE',
+        headers: { 'Accept': 'application/json', 'X-User-Id': user._id }
+      });
+      if (res.ok) {
+        alert('✅ Curso eliminado correctamente.');
+        fetchCourses();
+      } else {
+        const d = await res.json();
+        alert(d.message);
+      }
+    } catch { alert('Error de conexión'); }
   };
 
   const handleEditCourse = async (e) => {
@@ -107,7 +125,7 @@ const TeacherDashboard = () => {
         const d = await res.json();
         alert(d.message);
       }
-    } catch (e) { alert('Error conectando al servidor'); }
+    } catch { alert('Error conectando al servidor'); }
   };
 
   const handleDateSubmit = async (e) => {
@@ -120,7 +138,7 @@ const TeacherDashboard = () => {
          dates: validDates.map(d => new Date(d).toISOString().split('.')[0] + 'Z')
       };
 
-      const res = await fetch(`http://127.0.0.1:8000/api/v1/teacher/groups/${activeGroupId}/schedule`, {
+      const res = await fetch(`http://127.0.0.1:8000/api/v1/provider/groups/${activeGroupId}/schedule`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'Accept': 'application/json', 'X-User-Id': user._id },
         body: JSON.stringify(payload)
@@ -133,7 +151,7 @@ const TeacherDashboard = () => {
          const d = await res.json();
          alert(d.message);
       }
-    } catch (e) { alert('Error conectando al servidor'); }
+    } catch { alert('Error conectando al servidor'); }
   };
 
   const openEditModal = (course) => {
@@ -155,11 +173,11 @@ const TeacherDashboard = () => {
     <div>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '3rem' }}>
         <div>
-          <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Panel de Tutor</h1>
-          <p style={{ color: 'var(--text-muted)' }}>Gestiona tus micro-grupos, revisa ingresos generados y propone fechas.</p>
+          <h1 className="title" style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>Panel de Proveedor</h1>
+          <p style={{ color: 'var(--text-muted)' }}>Gestiona tus servicios, revisa ingresos generados y propone fechas.</p>
         </div>
         <button className="btn btn-primary" onClick={() => setShowCreateModal(true)}>
-          <Plus size={20} /> Nuevo Curso
+          <Plus size={20} /> Nuevo Servicio
         </button>
       </div>
 
@@ -188,7 +206,7 @@ const TeacherDashboard = () => {
                 <div style={{ display: 'flex', gap: '2rem' }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                     <Users size={18} color="var(--primary)" />
-                    <span>{subs?.total_subscribers || 0} Alumnos Inscritos</span>
+                    <span>{subs?.total_subscribers || 0} Clientes Inscritos</span>
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-muted)' }}>
                     <Activity size={18} color="var(--secondary)" />
@@ -213,13 +231,20 @@ const TeacherDashboard = () => {
                 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                   {course.status !== 'DRAFT' ? (
-                    <button onClick={() => navigate('/teacher/finances')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)' }}>
+                    <button onClick={() => navigate('/provider/finances')} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)' }}>
                       <CalendarIcon size={16} /> Ver Resultados de Votación
                     </button>
                   ) : (
-                    <button onClick={() => openEditModal(course)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)' }}>
-                      📝 Editar Curso
-                    </button>
+                    <div style={{ display: 'flex', gap: '0.5rem' }}>
+                      <button onClick={() => openEditModal(course)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--text-main)', gap: '0.4rem' }}>
+                        <Edit3 size={16} /> Editar
+                      </button>
+                      {course.status === 'DRAFT' && (
+                        <button onClick={() => handleDeleteCourse(courseId)} className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem', border: 'none', color: 'var(--danger)', gap: '0.4rem' }}>
+                          <Trash2 size={16} /> Eliminar
+                        </button>
+                      )}
+                    </div>
                   )}
 
                   {course.status === 'DRAFT' && (
@@ -316,4 +341,4 @@ const TeacherDashboard = () => {
   );
 };
 
-export default TeacherDashboard;
+export default ProviderDashboard;

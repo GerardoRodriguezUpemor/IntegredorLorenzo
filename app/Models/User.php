@@ -6,9 +6,11 @@ use MongoDB\Laravel\Auth\User as MongoUser;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
 
+use MongoDB\Laravel\Eloquent\SoftDeletes;
+
 class User extends MongoUser
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     protected $connection = 'mongodb';
     protected $collection = 'users';
@@ -35,15 +37,15 @@ class User extends MongoUser
     }
 
     /**
-     * Perfil de teacher (si aplica).
+     * Perfil de proveedor (si aplica).
      */
-    public function teacher()
+    public function provider()
     {
-        return $this->hasOne(Teacher::class);
+        return $this->hasOne(Provider::class);
     }
 
     /**
-     * Reservaciones de este usuario (como estudiante).
+     * Reservaciones de este usuario (como cliente).
      */
     public function reservations()
     {
@@ -59,18 +61,18 @@ class User extends MongoUser
     }
 
     /**
-     * ¿Es teacher?
+     * ¿Es proveedor?
      */
-    public function isTeacher(): bool
+    public function isProvider(): bool
     {
-        return $this->role === 'TEACHER';
+        return $this->role === 'PROVIDER';
     }
 
     /**
-     * ¿Es estudiante?
+     * ¿Es cliente?
      */
-    public function isStudent(): bool
+    public function isClient(): bool
     {
-        return $this->role === 'STUDENT';
+        return $this->role === 'CLIENT';
     }
 }

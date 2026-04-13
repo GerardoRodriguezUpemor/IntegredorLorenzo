@@ -5,9 +5,11 @@ namespace App\Models;
 use MongoDB\Laravel\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
+use MongoDB\Laravel\Eloquent\SoftDeletes;
+
 class Course extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $connection = 'mongodb';
     protected $collection = 'courses';
@@ -15,7 +17,7 @@ class Course extends Model
     protected $fillable = [
         'name',
         'description',
-        'teacher_id',
+        'provider_id',
         'status',
         'approved_by',
         'approved_at',
@@ -27,11 +29,11 @@ class Course extends Model
     ];
 
     /**
-     * El teacher que creó este curso.
+     * El proveedor que creó este servicio.
      */
-    public function teacher()
+    public function provider()
     {
-        return $this->belongsTo(Teacher::class);
+        return $this->belongsTo(Provider::class);
     }
 
     /**

@@ -3,16 +3,14 @@ import { createContext, useContext, useState, useEffect } from 'react';
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState(() => {
+    const savedUser = localStorage.getItem('ep4_user');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
+  const [loading] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for saved user session on mount
-    const savedUser = localStorage.getItem('ep4_user');
-    if (savedUser) {
-      setUser(JSON.parse(savedUser));
-    }
-    setLoading(false);
+    // Session already initialized in useState
   }, []);
 
   const login = (userData) => {
@@ -32,4 +30,5 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const useAuth = () => useContext(AuthContext);

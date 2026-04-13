@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Reporte de Grupo — {{ $group->name }}</title>
+    <title>Reporte de Gestión — {{ $group->name }}</title>
     <style>
         body { font-family: sans-serif; color: #333; padding: 20px; }
         .header { text-align: center; border-bottom: 2px solid #6c63ff; padding-bottom: 10px; margin-bottom: 20px; }
@@ -17,19 +17,19 @@
 </head>
 <body>
     <div class="header">
-        <h1>REPORTE DE COHORTE ACTIVADA</h1>
-        <p>MicroCohorts EP4 — Gestión Docente</p>
+        <h1>REPORTE DE SERVICIO ACTIVADO</h1>
+        <p>MicroCohorts EP4 — Gestión de Proveedor</p>
     </div>
 
     <div class="summary-box">
         <h3>{{ $course->name }}</h3>
         <p><strong>Grupo:</strong> {{ $group->name }}</p>
-        <p><strong>Profesor:</strong> {{ $teacher->name }}</p>
+        <p><strong>Proveedor:</strong> {{ $teacher->name }}</p>
         <p><strong>Estado:</strong> {{ $group->status }}</p>
-        <p><strong>Alumnos Inscritos:</strong> {{ $group->current_count }} / {{ $group->max_capacity }}</p>
+        <p><strong>Clientes Inscritos:</strong> {{ $group->current_count }} / {{ $group->max_capacity }}</p>
     </div>
 
-    <h3>Lista de Estudiantes (Inscripciones Confirmadas)</h3>
+    <h3>Lista de Clientes (Adquisiciones Confirmadas)</h3>
     <table>
         <thead>
             <tr>

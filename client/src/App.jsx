@@ -3,13 +3,13 @@ import { AuthProvider, useAuth } from './context/AuthContext';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
 import Register from './pages/Register';
-import StudentLayout from './components/layouts/StudentLayout';
-import TeacherLayout from './components/layouts/TeacherLayout';
-import Catalog from './pages/student/Catalog';
-import Checkout from './pages/student/Checkout';
-import MyCourses from './pages/student/MyCourses';
-import TeacherDashboard from './pages/teacher/Dashboard';
-import Finances from './pages/teacher/Finances';
+import ClientLayout from './components/layouts/ClientLayout';
+import ProviderLayout from './components/layouts/ProviderLayout';
+import Catalog from './pages/client/Catalog';
+import Checkout from './pages/client/Checkout';
+import MyCourses from './pages/client/MyCourses';
+import ProviderDashboard from './pages/provider/Dashboard';
+import Finances from './pages/provider/Finances';
 import AdminLayout from './components/layouts/AdminLayout';
 import AdminDashboard from './pages/admin/Dashboard';
 import Profile from './pages/shared/Profile';
@@ -33,25 +33,25 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Student Routes */}
-            <Route path="/student" element={
-              <ProtectedRoute allowedRole="STUDENT">
-                <StudentLayout />
+            {/* Client Routes */}
+            <Route path="/client" element={
+              <ProtectedRoute allowedRole="CLIENT">
+                <ClientLayout />
               </ProtectedRoute>
             }>
-              <Route path="courses" element={<Catalog />} />
-              <Route path="my-courses" element={<MyCourses />} />
+              <Route path="services" element={<Catalog />} />
+              <Route path="my-services" element={<MyCourses />} />
               <Route path="checkout/:groupId" element={<Checkout />} />
               <Route path="profile" element={<Profile />} />
             </Route>
 
-            {/* Teacher Routes */}
-            <Route path="/teacher" element={
-              <ProtectedRoute allowedRole="TEACHER">
-                <TeacherLayout />
+            {/* Provider Routes */}
+            <Route path="/provider" element={
+              <ProtectedRoute allowedRole="PROVIDER">
+                <ProviderLayout />
               </ProtectedRoute>
             }>
-              <Route path="dashboard" element={<TeacherDashboard />} />
+              <Route path="dashboard" element={<ProviderDashboard />} />
               <Route path="finances" element={<Finances />} />
               <Route path="profile" element={<Profile />} />
             </Route>

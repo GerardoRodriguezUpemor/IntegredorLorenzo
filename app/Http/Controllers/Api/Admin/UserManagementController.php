@@ -73,4 +73,50 @@ class UserManagementController extends Controller
             'status' => 'success',
         ]);
     }
+
+    /**
+     * DELETE /api/v1/admin/users/{userId}
+     */
+    public function destroy(Request $request, string $userId): JsonResponse
+    {
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json(['message' => 'Usuario no encontrado.', 'status' => 'error'], 404);
+        }
+
+        // Bloquear eliminación del admin logueado por seguridad
+        $admin = $request->attributes->get('authenticated_user');
+        if ((string)$admin->_id === (string)$user->_id) {
+            return response()->json(['message' => 'No puedes eliminarte a ti mismo.', 'status' => 'error'], 403);
+        }
+
+        $user->delete(); // Soft Delete
+
+        AuditLog::record(
+            (string) $admin->_id,
+            'USER_DELETED_LOGICALLY',
+            'User',
+            $userId,
+            ['user_name' => $user->name, 'user_email' => $user->email]
+        );
+
+        return response()->json([
+            'message' => 'Usuario eliminado (borrado lógico) correctamente.',
+            'status' => 'success',
+        ]);
+    }
+
+    /**
+     * GET /api/v1/admin/users/report
+     */
+    public function downloadReport(Request $request, \App\Infrastructure\Pdf\UserDirectoryPdfGenerator $generator)
+    {
+        $users = User::orderBy('name', 'asc')->get();
+        $pdfContent = $generator->generate($users);
+
+        return response($pdfContent)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'attachment; filename="directorio_usuarios_ep4.pdf"');
+    }
 }

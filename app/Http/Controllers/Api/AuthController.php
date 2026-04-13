@@ -20,7 +20,7 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email',
             'password' => 'required|string|min:6',
-            'role' => 'in:STUDENT,TEACHER',
+            'role' => 'in:CLIENT,PROVIDER',
         ]);
 
         if ($validator->fails()) {
@@ -43,12 +43,12 @@ class AuthController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => $request->password,
-            'role' => $request->role ?? 'STUDENT',
+            'role' => $request->role ?? 'CLIENT',
         ]);
 
-        // Si es teacher, crear el perfil de teacher
-        if ($user->role === 'TEACHER') {
-            $user->teacher()->create([
+        // Si es provider, crear el perfil de provider
+        if ($user->role === 'PROVIDER') {
+            $user->provider()->create([
                 'name' => $user->name,
                 'email' => $user->email,
                 'specialty' => $request->specialty ?? 'General',

@@ -6,7 +6,7 @@ import { BookOpen, AlertCircle } from 'lucide-react';
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [role, setRole] = useState('STUDENT');
+  const [role, setRole] = useState('CLIENT');
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useAuth();
@@ -40,11 +40,11 @@ const Login = () => {
 
       login(realUser);
 
-      if (realUser.role === 'STUDENT') navigate('/student/courses');
-      else if (realUser.role === 'TEACHER') navigate('/teacher/dashboard');
+      if (realUser.role === 'CLIENT') navigate('/client/services');
+      else if (realUser.role === 'PROVIDER') navigate('/provider/dashboard');
       else navigate('/admin/dashboard');
 
-    } catch (err) {
+    } catch {
       setError('Error conectando al servidor');
     }
   };
@@ -96,8 +96,8 @@ const Login = () => {
               value={role}
               onChange={(e) => setRole(e.target.value)}
             >
-              <option value="STUDENT">Estudiante</option>
-              <option value="TEACHER">Profesor</option>
+              <option value="CLIENT">Cliente</option>
+              <option value="PROVIDER">Proveedor</option>
               <option value="ADMIN">Administrador</option>
             </select>
           </div>
